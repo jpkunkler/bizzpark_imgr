@@ -3,7 +3,7 @@ from os.path import basename
 from flask import Flask, request, redirect, url_for, flash, send_file
 from werkzeug.utils import secure_filename
 import io
-import zipfile
+from zipfile import ZipFile
 
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = set(['jpg', 'png'])
@@ -22,7 +22,7 @@ def allowed_file(filename):
 @app.route("/download")
 def download_files():
     memory_file = io.BytesIO()
-    with zipfile.ZipFile(memory_file, 'w') as zf:
+    with ZipFile(memory_file, 'w') as zf:
         files = os.listdir(os.path.join(app.root_path, "uploads"))
         for individualFile in files:
             path = os.path.join(app.root_path, "uploads", individualFile)
