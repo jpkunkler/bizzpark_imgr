@@ -5,6 +5,8 @@ from werkzeug.utils import secure_filename
 import io
 from zipfile import ZipFile
 
+from convert import addIcon
+
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = set(['jpg', 'png'])
 
@@ -43,6 +45,15 @@ def upload_file():
                 print(f)
                 filename = secure_filename(f.filename)
                 f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        files = os.listdir(os.path.join(app.root_path, "uploads"))
+        for individualFile in files:
+            path = os.path.join(app.root_path, "uploads", individualFile)
+            building = request.form["building_id"]
+            company = request.form["text_name"]
+            img, directory, outfile = addIcon(path, building, company, os.path.join(app.root_path, "converted"))
+            print(img, os.path.join(directory,outfile))
+            img.save(os.path.join(directory,outfile), "JPEG")
+
     return """
     <!DOCTYPE html>
 <html lang="en">
