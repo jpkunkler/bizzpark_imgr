@@ -57,7 +57,6 @@ def handle_upload():
             
             for f in files:
                 if f and allowed_file(f.filename):
-                    print(f)
                     filename = secure_filename(f.filename)
                     f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             
