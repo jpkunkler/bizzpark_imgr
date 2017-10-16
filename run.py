@@ -1,6 +1,6 @@
 import os
 from os.path import basename
-from flask import Flask, request, redirect, url_for, flash, send_file
+from flask import Flask, request, redirect, url_for, flash, send_file, render_template
 from werkzeug.utils import secure_filename
 import io
 import shutil
@@ -43,95 +43,36 @@ def download_files():
 
     return send_file(memory_file, attachment_filename='{}.zip'.format(basename(folderpath)), as_attachment=True)
 
-@app.route("/", methods=['GET', 'POST'])
-def upload_file():
+@app.route("/upload", methods=["GET", "POST"])
+def handle_upload():
     if request.method == 'POST':
-        # check if the post request has the file part
-        if not request.files.getlist("file[]"):
-            flash('No file part')
-            return redirect(request.url)
+            # check if the post request has the file part
+            if not request.files.getlist("file[]"):
+                flash('No file part')
+                return redirect(request.url)
 
-        files = request.files.getlist('file[]')
-        building = request.form["building_id"]
-        company = request.form["text_name"]
-        
-        for f in files:
-            if f and allowed_file(f.filename):
-                print(f)
-                filename = secure_filename(f.filename)
-                f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        
-        # convert uploaded files now
-        files = os.listdir(os.path.join(app.root_path, "uploads"))
-        for individualFile in files:
-            path = os.path.join(app.root_path, "uploads", individualFile)
-            img, directory, outfile = addIcon(path, building, company, os.path.join(app.root_path, "converted"))
-            img.save(os.path.join(directory,outfile), "JPEG")
+            files = request.files.getlist('file[]')
+            building = request.form["building_id"]
+            company = request.form["text_name"].replace(" ", "_").lower()
+            
+            for f in files:
+                if f and allowed_file(f.filename):
+                    print(f)
+                    filename = secure_filename(f.filename)
+                    f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+            # convert uploaded files now
+            files = os.listdir(os.path.join(app.root_path, "uploads"))
+            for individualFile in files:
+                path = os.path.join(app.root_path, "uploads", individualFile)
+                img, directory, outfile = addIcon(path, building, company, os.path.join(app.root_path, "converted"))
+                img.save(os.path.join(directory,outfile), "JPEG")
 
-    return """
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>BIZZPARK App Image Converter</title>
+            return redirect(url_for('download_files'))
 
-</head>
-<body>
-    <div style="width:600px">
-        
-        <form action="" method="post" enctype="multipart/form-data">
-        <ul>
-        
-            <li>
-                <label for="select_id">Bitte Gebäudenummer auswählen</label>
-                <select name="building_id" id="select_id">
-                    <option value="01">01</option>
-                    <option value="02">02</option>
-                    <option value="value 3">03</option>
-                    <option value="value 1">04</option>
-                    <option value="value 1">05</option>
-                    <option value="value 1">06</option>
-                    <option value="value 1">07</option>
-                    <option value="value 1">08</option>
-                    <option value="value 1">09</option>
-                    <option value="value 1">10</option>
-                    <option value="value 1">11</option>
-                    <option value="value 1">12</option>
-                    <option value="value 1">13</option>
-                    <option value="value 1">14</option>
-                    <option value="value 1">15</option>
-                    <option value="value 1">16</option>
-                    <option value="value 1">17</option>
-                    <option value="value 1">18</option>
-                    <option value="value 1">19</option>
-                    <option value="value 1">20</option>
-                </select>
-            </li>
-        
-            <li>
-                <label for="text_id">Bitte Unternehmen auswählen</label>
-                <input type="text" name="text_name" id="text_id" value=""/>
-            </li>
-
-            <li>
-                <label>Wählen Sie die hochzuladenden Dateien von Ihrem Rechner aus:
-                <input name="file[]" type="file" multiple> 
-              </label> 
-            </li>
-            <li><button>hochladen</button></li>
-            <li><a href="/download">Click me.</a></li>
-        
-        </ul>
-        
-        </form>
-        
-        </div>
-</body>
-</html>
-    <p>%s</p>
-    """ % "<br>".join(os.listdir(app.config['UPLOAD_FOLDER'],))
+@app.route("/")
+def index():
+    return render_template('index.html') 
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5001, debug=True)
