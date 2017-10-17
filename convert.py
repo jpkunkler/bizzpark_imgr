@@ -8,8 +8,7 @@ def addIcon(filename, num, company, output_dir):
     source = Image.open(filename).convert("RGBA")
     
     # select font
-    #fnt = ImageFont.truetype('Open_Sans/OpenSans-bold.ttf', 150)
-    fnt = ImageFont.truetype('OpenSans-bold.ttf', 150)
+    fnt = ImageFont.truetype('OpenSans-Bold.ttf', 150)
 
     # resize image
     source_width, source_height = source.size
