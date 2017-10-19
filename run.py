@@ -28,8 +28,10 @@ def download_files():
     memory_file = io.BytesIO()
     with ZipFile(memory_file, 'w') as zf:
         files = os.listdir(os.path.join(app.root_path, "converted"))
+        print(files)
         for individualFile in files:
             folderpath = os.path.join(app.root_path, "converted", individualFile)
+            print(folderpath)
             for f in os.listdir(folderpath):
                 filepath = os.path.join(folderpath, f)
                 zf.write(filepath, basename(filepath)) # only add last part of our path to zip --> image file!    
@@ -41,7 +43,18 @@ def download_files():
     os.makedirs(os.path.join(app.config['UPLOAD_FOLDER']), exist_ok=True)
     os.makedirs(os.path.join("converted"), exist_ok=True)
 
-    return send_file(memory_file, attachment_filename='{}.zip'.format(basename(folderpath)), as_attachment=True)
+    return send_file(memory_file, attachment_filename='converted_files.zip', as_attachment=True)
+    #return send_file(memory_file, attachment_filename='{}.zip'.format(basename(folderpath)), as_attachment=True)
+
+@app.route("/convert/<building>/<company>")
+def convert_files(building, company):
+    # convert uploaded files now
+    files = os.listdir(os.path.join(app.root_path, "uploads"))
+    for individualFile in files:
+        path = os.path.join(app.root_path, "uploads", individualFile)
+        img, directory, outfile = addIcon(path, building, company, os.path.join(app.root_path, "converted"))
+        img.save(os.path.join(directory,outfile), "JPEG")
+    return redirect("/download")
 
 @app.route("/upload", methods=["GET", "POST"])
 def handle_upload():
@@ -60,14 +73,9 @@ def handle_upload():
                     filename = secure_filename(f.filename)
                     f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             
-            # convert uploaded files now
-            files = os.listdir(os.path.join(app.root_path, "uploads"))
-            for individualFile in files:
-                path = os.path.join(app.root_path, "uploads", individualFile)
-                img, directory, outfile = addIcon(path, building, company, os.path.join(app.root_path, "converted"))
-                img.save(os.path.join(directory,outfile), "JPEG")
 
-            return redirect(url_for('download_files'))
+            return ""
+            #return redirect(url_for('download_files'))
 
 @app.route("/")
 def index():

@@ -15,7 +15,7 @@
 <body>
     <div class="row register-form">
         <div class="col-md-8 col-md-offset-2">
-            <form class="form-horizontal custom-form" action="/upload" method="post" enctype="multipart/form-data">
+            <form id="upload-form" class="form-horizontal custom-form" action="/upload" method="post" enctype="multipart/form-data">
                 <img src="{{ url_for('static', filename='assets/img/logo.png') }}" width="30%">
                 <br>
                 <h1>BIZZPARK App - Bild Konvertierung</h1>
@@ -24,7 +24,7 @@
                         <label class="control-label" for="dropdown-input-field">Gebäudenummer </label>
                     </div>
                     <div class="col-sm-4 input-column">
-                        <select class="form-control" name="building_id">
+                        <select class="form-control" name="building_id" id="building">
                             <optgroup label="Bitte auswählen">
                                 <option value="01" selected="">01</option>
                                 <option value="02">02</option>
@@ -55,7 +55,7 @@
                         <label class="control-label" for="name-input-field">Unternehmen </label>
                     </div>
                     <div class="col-sm-4 input-column">
-                        <input class="form-control" type="text" name="text_name">
+                        <input class="form-control" type="text" name="text_name" id="company">
                     </div>
                 </div>
                 <div class="form-group">
@@ -74,6 +74,27 @@
     </div>
     <script src="{{url_for('static', filename='assets/js/jquery.min.js')}}"></script>
     <script src="{{url_for('static', filename='assets/bootstrap/js/bootstrap.min.js')}}"></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script> 
+    <script src="http://malsup.github.com/jquery.form.js"></script> 
+
+    <script>
+	$(document).ready(function() {
+		var options = {
+			success: showResponse
+		};
+
+		$("#upload-form").ajaxForm(options);
+	});
+
+	function showResponse(responseText, statusText, xhr, $form) {
+		var building = $("#building").val();
+		var company = $("#company").val();
+		alert("status: " + statusText + "\nresponseText: \n" + responseText + "\nbuilding: " + building + "\ncompany: " + company);
+		window.location = "/convert/" + building + "/" + company;
+	}
+    </script>
 </body>
+
 
 </html>
