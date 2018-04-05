@@ -1,4 +1,10 @@
+import os
 from PIL import Image, ImageFont, ImageDraw, ImageEnhance
+
+# create directory to hold output files
+directory = "icons/"
+if not os.path.exists(directory):
+    os.makedirs(directory)
 
 def createIcon(num):
 	fnt = ImageFont.truetype("OpenSans-Bold.ttf", size=150)
