@@ -1,12 +1,14 @@
 import os
 from PIL import Image, ImageFont, ImageDraw, ImageEnhance
 
-# create directory to hold output files
-directory = "icons/"
-if not os.path.exists(directory):
-    os.makedirs(directory)
+
 
 def createIcon(num, size):
+
+	# create directory to hold output files
+	directory = "icons/{}/".format(size)
+	if not os.path.exists(directory):
+		os.makedirs(directory)
 
 	# check for size (properties: sm = small, lg = large, xl = extra-large)
 	if size == "sm":
@@ -35,7 +37,9 @@ def createIcon(num, size):
 	w, h = fnt.getsize(msg)
 	draw.text(((W-w)/2,(H-h)/2 - offset), msg, font=fnt,fill=(255, 255, 255))
 
-	im.save("icons/{}.png".format(msg), "PNG")
+	im.save("icons/{}/{}.png".format(size, msg), "PNG")
 
-for i in range(1, 25):
+for i in range(1, 21):
+	createIcon(i, "xl")
 	createIcon(i, "lg")
+	createIcon(i, "sm")
